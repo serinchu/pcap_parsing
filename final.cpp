@@ -118,8 +118,8 @@ int main(int argc, char *argv[]) {
 				tcp_hdr *tcp_h = (tcp_hdr *)((uint8_t *)ip_h +  ip_hdr_len );
 
 				printf("---------------------------TCP------------------------\n");
-				printf("|      source port = %d\n",(ntohs)(tcp_h->sport));
-				printf("| destination port = %d\n",(ntohs)(tcp_h->dport));
+				printf("|      source port = %d\n",ntohs(tcp_h->sport));
+				printf("| destination port = %d\n",ntohs(tcp_h->dport));
 				printf("------------------------------------------------------\n");
 				
 				tcp_hdr_len = ((tcp_h->hdr_len) >> 4) << 2;					//20~60
@@ -131,7 +131,8 @@ int main(int argc, char *argv[]) {
 					printf("| DATA = ");
 					if(data_len < MAX_DATA_LEN)
 						print_data_len = data_len;
-					print_data_len = MAX_DATA_LEN;
+					else 
+						print_data_len = MAX_DATA_LEN;
 					for(int i = 0; (i < print_data_len) ; i++)
 						printf("%.2X ", data[i]);
 					printf(" |\n");
