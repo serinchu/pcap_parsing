@@ -32,10 +32,10 @@ typedef struct _ip_hdr
 	uint16_t id;
 	uint16_t flag_offset;
 	uint8_t ttl;
-	uint8_t protocol;		//
+	uint8_t protocol;		
 	uint16_t checksum;
-	uint8_t sip[IP_ADDR_LEN];
-	uint8_t dip[IP_ADDR_LEN];	
+	uint32_t sip;
+	uint32_t dip;	
 } ip_hdr;
 
 typedef struct _tcp_hdr
@@ -83,8 +83,8 @@ int main(int argc, char *argv[]) {
 	{
 		//여기서는 pcap_pkthdr *header가 필요 없을거라 생각했는데, 없으면 segmentation fault가 뜨더라
 		//
-		struct pcap_pkthdr* header = NULL;
-		const u_char* packet = NULL;
+		struct pcap_pkthdr* header;
+		const u_char* packet;
 		/*
 		pcap_next		=>	return a u_char pointer to the data in that packet
 		pcap_next_ex	=>	return a intager (  1 = no error
@@ -92,8 +92,7 @@ int main(int argc, char *argv[]) {
 											   -1 = error
 											   -2 = EOF     )
 		*/
-//		int res = pcap_next_ex(handle, &header, &packet);
-		int res = pcap_next_ex(handle, (void *)NULL , &packet);
+		int res = pcap_next_ex(handle, &header, &packet);
 		if (res == 0) 					//none be captured ( timeout )
 			continue;
 		if (res == -1 || res == -2)		//pcap_next_ex error
@@ -137,12 +136,8 @@ int main(int argc, char *argv[]) {
 
 				if(data_len > 0)
 				{
-					uint16_t print_data_len = 0;
+					uint16_t print_data_len = data_len < MAX_DATA_LEN ? data_len : MAX_DATA_LEN;
 					printf("| DATA = ");
-					if(data_len < MAX_DATA_LEN)
-						print_data_len = data_len;
-					else 
-						print_data_len = MAX_DATA_LEN;
 					for(int i = 0; i < print_data_len ; i++)
 						printf("%.2X ", data[i]);
 					printf(" |\n");
@@ -151,7 +146,7 @@ int main(int argc, char *argv[]) {
 			//tcp end
 		}
 		//ip end
-		printf("\n");
+		printf("\n\n");
 	}
 	//while end
 
